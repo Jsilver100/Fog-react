@@ -5,8 +5,8 @@ import ProductModal from "../Components/ProductModal";
 import { ShoppingCart, Search, Loader, AlertCircle } from "lucide-react";
 import { 
   fetchAllProducts, 
-  searchProducts, 
-  getProductsByCategory 
+  searchProducts,
+  fetchProductDetails
 } from "../data/realProductsAPI";
 
 export default function Products({ limit = null, compact = false }) {
@@ -23,19 +23,16 @@ export default function Products({ limit = null, compact = false }) {
       try {
         setLoading(true);
         setError(null);
-        console.log("Component: Fetching products...");
         
         const data = await fetchAllProducts();
-        
+
         if (!data || data.length === 0) {
           setError("No products available. Please try again later.");
           setProducts([]);
         } else {
           setProducts(data);
-          console.log(`Component: Loaded ${data.length} products`);
         }
       } catch (err) {
-        console.error("Component: Error loading products:", err);
         setError(`Failed to load products: ${err.message}`);
         setProducts([]);
       } finally {
@@ -49,7 +46,7 @@ export default function Products({ limit = null, compact = false }) {
   // Handle search
   const handleSearch = async (term) => {
     setSearchTerm(term);
-    
+
     if (term.trim() === "") {
       setProducts(await fetchAllProducts());
     } else {
@@ -59,37 +56,44 @@ export default function Products({ limit = null, compact = false }) {
     }
   };
 
-  // Filter products
-  const filteredProducts = compact
-    ? products.filter(p => p.category === "phones")
-    : products;
+  // Filter products (can add category filtering here if needed)
+  const filteredProducts = products;
 
+  // Apply limit if provided
   const finalProducts = limit
-    ? filteredProducts.slice(0, limit)
+    ? filteredProducts.slice(-limit).reverse() // take last N products and reverse to show newest first
     : filteredProducts;
 
-  const openModal = (product) => {
-    setSelectedProduct(product);
+  // OPEN MODAL (FETCH FULL DETAILS)
+  const openModal = async (product) => {
+    setLoading(true);
+    const full = await fetchProductDetails(product.id);
+
+    if (full) {
+      setSelectedProduct(full);
+    } else {
+      alert("Could not load product details.");
+    }
+    setLoading(false);
   };
 
-  const closeModal = () => {
-    setSelectedProduct(null);
-  };
+  // CLOSE MODAL
+  const closeModal = () => setSelectedProduct(null);
 
+  // Add to Cart
   const handleAddToCart = (productData) => {
     addToCart(productData);
     closeModal();
   };
 
   // Loading state
-  if (loading) {
+  if (loading && products.length === 0) {
     return (
       <section className="products-section">
         <h2>{compact ? "Latest Products" : "All Products"}</h2>
         <div className="loading-container">
           <Loader size={50} className="spinner" />
-          <p>Loading products from real APIs...</p>
-          <p className="loading-subtext">This may take a moment</p>
+          <p>Loading products...</p>
         </div>
       </section>
     );

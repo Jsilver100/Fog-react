@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { CartContext } from "../lib/cart";
-import { X, Trash2 } from "lucide-react"; // lucide-react icons
+import { X, Trash2 } from "lucide-react";
 import "./CartPanel.css";
 
 export default function CartPanel() {
@@ -21,7 +21,7 @@ export default function CartPanel() {
   return (
     <div className={`cart ${showCart ? "showcart" : ""}`}>
       <h2>
-        Your Cart
+        Your Cart ({cartItems.length})
         <button className="cancelcart" onClick={() => setShowCart(false)}>
           <X size={20} />
         </button>
@@ -32,15 +32,31 @@ export default function CartPanel() {
 
         {cartItems.map((item, idx) => (
           <div key={idx} className="cart-details">
-            <img src={item.img} className="prodimg" alt={item.title} />
+            <img 
+              src={item.img || item.imgsrc} 
+              className="prodimg" 
+              alt={item.title}
+              onError={(e) => {
+                e.target.src = `https://via.placeholder.com/55x70?text=${item.title}`;
+              }}
+            />
             <div className="quantity">
               <h3 className="product-title">{item.title}</h3>
+              
+              {/* Show selected color if available */}
+              {item.selectedColor && (
+                <span style={{ fontSize: "12px", color: "#888", marginTop: "-5px" }}>
+                  Color: <strong>{item.selectedColor}</strong>
+                </span>
+              )}
+              
               <span className="price">
                 <b>₦ {item.price.toLocaleString()}</b>
                 <Trash2
                   className="deleteprod"
                   size={18}
                   onClick={() => removeFromCart(item.id)}
+                  style={{ cursor: "pointer" }}
                 />
               </span>
 

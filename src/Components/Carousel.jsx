@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import "./Carousel.css";
 
 import mob6s from "../assets/mob6s.mp4";
-import mob6sPoster from "../assets/WhatsApp-Image-2025-05-05-at-12.35.25_5d211a68.jpg";
+import mob6sPoster from "../assets/tecno-spark-30c-1.jpg";
 
 import sparkPreview from "../assets/spark_preview_m.mp4";
 import sparkPoster from "../assets/tecno-preview.jpg";
