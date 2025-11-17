@@ -1,0 +1,153 @@
+.cart {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 50vh;
+  background: #e0e1f5;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: 0.5s ease-in-out;
+  padding: 0 15px;
+  z-index: 9999;
+}
+
+.showcart {
+  transform: translateY(0);
+}
+
+.cart h2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20px;
+  padding: 15px 0;
+  border-bottom: 1px solid grey;
+  color: #6471ff;
+  position: sticky;
+  top: 0;
+  background: #e0e1f5;
+}
+
+.cancelcart {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.product {
+  height: 23vh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  padding: 10px 0;
+}
+
+.product::-webkit-scrollbar {
+  width: 5px;
+}
+
+.product::-webkit-scrollbar-track {
+  background: whitesmoke;
+}
+
+.product::-webkit-scrollbar-thumb {
+  background: #e60023;
+}
+
+.cart-details {
+  display: flex;
+  gap: 10px;
+  padding: 18px 13px;
+  background: white;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  align-items: center;
+  scroll-snap-align: start;
+}
+
+.prodimg {
+  width: 55px;
+  height: 70px;
+  object-fit: cover;
+}
+
+.quantity {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.product-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.price {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #313137;
+  position: relative;
+}
+
+.price img.deleteprod {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: -5px;
+}
+
+.increment {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.increment button {
+  width: 28px;
+  height: 24px;
+  background: #e60023;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.increment button:disabled {
+  background: grey;
+  cursor: not-allowed;
+}
+
+.cartnum {
+  min-width: 20px;
+  text-align: center;
+}
+
+.totalprice {
+  font-weight: bold;
+  text-align: right;
+  margin-top: 1rem;
+}
+
+.proceed {
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  background: #6471ff;
+  color: white;
+  font-weight: bold;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+.emptycart {
+  text-align: center;
+  color: #e60023;
+  margin-top: 50px;
+}
