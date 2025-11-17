@@ -1,91 +1,192 @@
-import React, { useEffect, useState, useContext } from "react"; import "./Products.css"; import { CartContext } from "../lib/cart"; import productsData from "../data/Products"; import { ShoppingCart, Search, X } from "lucide-react";
+import React, { useEffect, useState, useContext } from "react";
+import "./Products.css";
+import { CartContext } from "../lib/cart";
+import ProductModal from "../Components/ProductModal";
+import { ShoppingCart, Search, Loader, AlertCircle } from "lucide-react";
+import { 
+  fetchAllProducts, 
+  searchProducts, 
+  getProductsByCategory 
+} from "../data/realProductsAPI";
 
-export default function Products({ limit = null, compact = false }) { const { addToCart } = useContext(CartContext); const [searchTerm, setSearchTerm] = useState(""); const [products, setProducts] = useState([]);
+export default function Products({ limit = null, compact = false }) {
+  const { addToCart } = useContext(CartContext);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-const [selectedProduct, setSelectedProduct] = useState(null); const [selectedColor, setSelectedColor] = useState(""); const [quantity, setQuantity] = useState(1);
+  // Fetch products on mount
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log("Component: Fetching products...");
+        
+        const data = await fetchAllProducts();
+        
+        if (!data || data.length === 0) {
+          setError("No products available. Please try again later.");
+          setProducts([]);
+        } else {
+          setProducts(data);
+          console.log(`Component: Loaded ${data.length} products`);
+        }
+      } catch (err) {
+        console.error("Component: Error loading products:", err);
+        setError(`Failed to load products: ${err.message}`);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-useEffect(() => { setProducts(productsData); }, []);
+    loadProducts();
+  }, []);
 
-const filteredProducts = compact ? products : products.filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Handle search
+  const handleSearch = async (term) => {
+    setSearchTerm(term);
+    
+    if (term.trim() === "") {
+      setProducts(await fetchAllProducts());
+    } else {
+      const allProducts = await fetchAllProducts();
+      const results = await searchProducts(term, allProducts);
+      setProducts(results);
+    }
+  };
 
-const finalProducts = limit ? filteredProducts.slice(0, limit) : filteredProducts;
+  // Filter products
+  const filteredProducts = compact
+    ? products.filter(p => p.category === "phones")
+    : products;
 
-const openModal = (product) => { setSelectedProduct(product); setSelectedColor(product.colors?.[0] || ""); setQuantity(1); };
+  const finalProducts = limit
+    ? filteredProducts.slice(0, limit)
+    : filteredProducts;
 
-const closeModal = () => { setSelectedProduct(null); };
+  const openModal = (product) => {
+    setSelectedProduct(product);
+  };
 
-const handleAddToCart = () => { addToCart({ ...selectedProduct, selectedColor, quantity }); closeModal(); };
+  const closeModal = () => {
+    setSelectedProduct(null);
+  };
 
-return ( <section id={compact ? "LatestProducts" : "Products"} className="products-section"> <h2>{compact ? "Latest Products" : "Products"}</h2>
+  const handleAddToCart = (productData) => {
+    addToCart(productData);
+    closeModal();
+  };
 
-{!compact && (
-    <div className="Search-bar">
-      <Search size={18} className="search-icon" />
-      <input
-        type="text"
-        placeholder="Search products..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-    </div>
-  )}
+  // Loading state
+  if (loading) {
+    return (
+      <section className="products-section">
+        <h2>{compact ? "Latest Products" : "All Products"}</h2>
+        <div className="loading-container">
+          <Loader size={50} className="spinner" />
+          <p>Loading products from real APIs...</p>
+          <p className="loading-subtext">This may take a moment</p>
+        </div>
+      </section>
+    );
+  }
 
-  <div className={`products ${compact ? "Latest" : ""}`}>
-    {finalProducts.length === 0 && <p>No products found.</p>}
+  // Error state
+  if (error && products.length === 0) {
+    return (
+      <section className="products-section">
+        <h2>{compact ? "Latest Products" : "All Products"}</h2>
+        <div className="error-container">
+          <AlertCircle size={40} className="error-icon" />
+          <p className="error-message">{error}</p>
+          <button 
+            className="retry-btn" 
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
+  }
 
-    {finalProducts.map((product) => (
-      <div key={product.id} className="prod" onClick={() => openModal(product)}>
-        <div className="prod-img"><img src={product.imgsrc} alt={product.name} /></div>
-        <h3 className="product-title">{product.name}</h3>
-        <p className="product-price">₦ {product.price.toLocaleString()}</p>
-        <button className="addcart" onClick={(e) => {e.stopPropagation(); addToCart(product);}}>
-          <ShoppingCart size={16} /> Add to Cart
-        </button>
-      </div>
-    ))}
-  </div>
+  return (
+    <section
+      id={compact ? "LatestProducts" : "Products"}
+      className="products-section"
+    >
+      <h2>{compact ? "Latest Products" : "All Products"}</h2>
 
-  {selectedProduct && (
-    <div className="product-modal-overlay" onClick={closeModal}>
-      <div className="product-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={closeModal}><X size={20} /></button>
+      {error && (
+        <div className="warning-banner">
+          <AlertCircle size={18} />
+          <span>{error}</span>
+        </div>
+      )}
 
-        <img src={selectedProduct.imgsrc} className="modal-img" alt={selectedProduct.name} />
-        <h2>{selectedProduct.name}</h2>
-        <p className="modal-price">₦ {selectedProduct.price.toLocaleString()}</p>
-
-        {selectedProduct.colors && (
-          <div className="modal-section">
-            <label>Choose Color:</label>
-            <select value={selectedColor} onChange={(e) => setSelectedColor(e.target.value)}>
-              {selectedProduct.colors.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        <div className="modal-section">
-          <label>Quantity:</label>
+      {!compact && (
+        <div className="Search-bar">
+          <Search size={18} className="search-icon" />
           <input
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={(e) => setQuantity(parseInt(e.target.value))}
+            type="text"
+            placeholder="Search phones, accessories..."
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
+      )}
 
-        <div className="modal-section details">
-          <h3>Product Details</h3>
-          <p>{selectedProduct.details || "No additional details available."}</p>
+      {finalProducts.length === 0 ? (
+        <div className="no-products">
+          <p>No products found. Try a different search term.</p>
         </div>
+      ) : (
+        <div className={`products ${compact ? "Latest" : ""}`}>
+          {finalProducts.map((product) => (
+            <div
+              key={product.id}
+              className="prod"
+              onClick={() => openModal(product)}
+            >
+              <div className="prod-img">
+                <img 
+                  src={product.imgsrc} 
+                  alt={product.name}
+                  onError={(e) => {
+                    e.target.src = `https://via.placeholder.com/200x250?text=${product.name}`;
+                  }}
+                />
+              </div>
+              <h3 className="product-title">{product.name}</h3>
+              <p className="product-price">
+                ₦ {product.price.toLocaleString()}
+              </p>
+              <button
+                className="addcart"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddToCart(product);
+                }}
+              >
+                <ShoppingCart size={16} /> Add to Cart
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
-        <button className="confirm-add" onClick={handleAddToCart}>
-          <ShoppingCart size={16} /> Add to Cart
-        </button>
-      </div>
-    </div>
-  )}
-</section>
-
-); }
+      {/* Product Modal */}
+      {selectedProduct && (
+        <ProductModal
+          product={selectedProduct}
+          onClose={closeModal}
+          addToCart={handleAddToCart}
+        />
+      )}
+    </section>
+  );
+}

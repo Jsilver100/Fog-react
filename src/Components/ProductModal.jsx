@@ -8,6 +8,20 @@ export default function ProductModal({ product, onClose, addToCart }) {
 
   if (!product) return null;
 
+  const handleAddToCart = () => {
+    addToCart({
+      ...product,
+      selectedColor,
+      quantity,
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      imgsrc: product.imgsrc,
+      img: product.imgsrc,
+      title: product.name
+    });
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
@@ -23,8 +37,8 @@ export default function ProductModal({ product, onClose, addToCart }) {
           <h2>{product.name}</h2>
           <p className="modal-price">₦ {product.price.toLocaleString()}</p>
 
-          {/* Colors */}
-          {product.colors && (
+          {/* Colors Section */}
+          {product.colors && product.colors.length > 0 && (
             <div className="color-section">
               <h4>Choose Color</h4>
               <div className="color-options">
@@ -41,7 +55,7 @@ export default function ProductModal({ product, onClose, addToCart }) {
             </div>
           )}
 
-          {/* Quantity */}
+          {/* Quantity Section */}
           <div className="qty-section">
             <h4>Quantity</h4>
             <div className="qty-box">
@@ -51,13 +65,31 @@ export default function ProductModal({ product, onClose, addToCart }) {
             </div>
           </div>
 
-          {/* Add to Cart */}
-          <button
-            className="modal-addcart"
-            onClick={() =>
-              addToCart({ ...product, selectedColor, quantity })
-            }
-          >
+          {/* Product Description */}
+          {product.details && (
+            <div className="details-section">
+              <h4>About This Product</h4>
+              <p className="details-text">{product.details}</p>
+            </div>
+          )}
+
+          {/* Product Specifications */}
+          {product.specs && (
+            <div className="specs-section">
+              <h4>Specifications</h4>
+              <div className="specs-grid">
+                {Object.entries(product.specs).map(([key, value]) => (
+                  <div key={key} className="spec-item">
+                    <span className="spec-label">{key.charAt(0).toUpperCase() + key.slice(1)}:</span>
+                    <span className="spec-value">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Add to Cart Button */}
+          <button className="modal-addcart" onClick={handleAddToCart}>
             <ShoppingCart size={18} />
             Add to Cart
           </button>
