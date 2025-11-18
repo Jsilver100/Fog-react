@@ -65,15 +65,15 @@
 .search-icon {
   position: absolute;
   left: 12px;
-  color: #e63946;
+  color: #d32f2f;
 }
 
 .Search-bar:hover {
-  box-shadow: 0 6px 20px rgba(230, 57, 70, 0.25);
+  box-shadow: 0 6px 20px rgba(211, 47, 47, 0.15);
 }
 
 .Search-bar:focus-within {
-  box-shadow: 0 0 15px rgba(230, 57, 70, 0.3);
+  box-shadow: 0 0 15px rgba(211, 47, 47, 0.2);
 }
 
 /* PRODUCTS GRID */
@@ -99,7 +99,7 @@
 
 .prod:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 25px rgba(211, 47, 47, 0.12);
 }
 
 .prod-img {
@@ -144,7 +144,7 @@
   font-size: 13px;
   margin-bottom: 6px;
   color: #333;
-  background: linear-gradient(135deg, #f03a47, #bf1d2d);
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -155,7 +155,7 @@
   justify-content: center;
   gap: 6px;
   padding: 7px 12px;
-  background: linear-gradient(135deg, #e63946, #d62828);
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -163,14 +163,14 @@
   font-weight: 600;
   font-size: 12px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.25);
   width: 100%;
 }
 
 .addcart:hover {
-  background: linear-gradient(135deg, #d62828, #b71c1c);
+  background: linear-gradient(135deg, #b71c1c, #9a1515);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(230, 57, 70, 0.35);
+  box-shadow: 0 6px 16px rgba(211, 47, 47, 0.3);
 }
 
 /* LOADING STATE */
@@ -185,7 +185,7 @@
 
 .spinner {
   animation: spin 1s linear infinite;
-  color: #d62828;
+  color: #d32f2f;
 }
 
 @keyframes spin {
@@ -216,12 +216,12 @@
 }
 
 .error-icon {
-  color: #d62828;
+  color: #d32f2f;
 }
 
 .error-message {
   font-size: 16px;
-  color: #d62828;
+  color: #d32f2f;
   font-weight: 500;
   text-align: center;
   max-width: 400px;
@@ -229,7 +229,7 @@
 
 .retry-btn {
   padding: 10px 25px;
-  background: linear-gradient(135deg, #d62828, #a81822);
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
   color: white;
   border: none;
   border-radius: 12px;
@@ -241,7 +241,7 @@
 
 .retry-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(214, 40, 40, 0.35);
+  box-shadow: 0 6px 16px rgba(211, 47, 47, 0.3);
 }
 
 /* NO PRODUCTS */

@@ -1,10 +1,12 @@
+// src/Components/CartPanel.jsx
 import React, { useEffect, useState, useContext } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { CartContext } from "../lib/cart";
-import { X, Trash2 } from "lucide-react";
+import { X, Trash2, Plus, Minus, ShoppingCart, ArrowRight } from "lucide-react";
 import "./CartPanel.css";
 
 export default function CartPanel() {
-  const { cartItems, removeFromCart, updateQuantity } = useContext(CartContext);
+  const { cartItems, removeFromCart, updateQuantity, clearCart } = useContext(CartContext);
   const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
@@ -18,75 +20,223 @@ export default function CartPanel() {
     0
   );
 
+  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  const cartVariants = {
+    hidden: { x: "100%" },
+    visible: { x: 0 },
+    exit: { x: "100%" },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: 20 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 20 },
+  };
+
   return (
-    <div className={`cart ${showCart ? "showcart" : ""}`}>
-      <h2>
-        Your Cart ({cartItems.length})
-        <button className="cancelcart" onClick={() => setShowCart(false)}>
-          <X size={20} />
-        </button>
-      </h2>
+    <>
+      <AnimatePresence>
+        {showCart && (
+          <motion.div
+            className="cart-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowCart(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      <div className="product">
-        {cartItems.length === 0 && <span className="emptycart">Your cart is empty</span>}
-
-        {cartItems.map((item, idx) => (
-          <div key={idx} className="cart-details">
-            <img 
-              src={item.img || item.imgsrc} 
-              className="prodimg" 
-              alt={item.title}
-              onError={(e) => {
-                e.target.src = `https://via.placeholder.com/55x70?text=${item.title}`;
-              }}
-            />
-            <div className="quantity">
-              <h3 className="product-title">{item.title}</h3>
-              
-              {/* Show selected color if available */}
-              {item.selectedColor && (
-                <span style={{ fontSize: "12px", color: "#888", marginTop: "-5px" }}>
-                  Color: <strong>{item.selectedColor}</strong>
-                </span>
-              )}
-              
-              <span className="price">
-                <b>₦ {item.price.toLocaleString()}</b>
-                <Trash2
-                  className="deleteprod"
-                  size={18}
-                  onClick={() => removeFromCart(item.id)}
-                  style={{ cursor: "pointer" }}
-                />
-              </span>
-
-              <div className="increment">
-                <button
-                  className="decrease"
-                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  disabled={item.quantity <= 1}
-                >
-                  -
-                </button>
-                <span className="cartnum">{item.quantity}</span>
-                <button
-                  className="increase"
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                >
-                  +
-                </button>
-              </div>
+      <motion.div
+        className={`cart ${showCart ? "showcart" : ""}`}
+        variants={cartVariants}
+        initial="hidden"
+        animate={showCart ? "visible" : "hidden"}
+        exit="hidden"
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+      >
+        {/* Cart Header */}
+        <motion.div
+          className="cart-header"
+          initial={{ opacity: 0, y: -10 }}
+          animate={showCart ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.1 }}
+        >
+          <div className="cart-title-section">
+            <ShoppingCart size={24} />
+            <div>
+              <h2>Your Cart</h2>
+              <p className="cart-items-count">
+                {totalItems} {totalItems === 1 ? "item" : "items"}
+              </p>
             </div>
           </div>
-        ))}
-      </div>
+          <motion.button
+            className="close-btn"
+            onClick={() => setShowCart(false)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <X size={24} />
+          </motion.button>
+        </motion.div>
 
-      {cartItems.length > 0 && (
-        <>
-          <span className="totalprice">Total: ₦ {totalPrice.toLocaleString()}</span>
-          <button className="proceed">Proceed To Payment</button>
-        </>
-      )}
-    </div>
+        {/* Cart Items */}
+        <motion.div className="cart-items-container">
+          {cartItems.length === 0 ? (
+            <motion.div
+              className="empty-cart"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <ShoppingCart size={48} />
+              <p>Your cart is empty</p>
+              <span>Start shopping to add items!</span>
+            </motion.div>
+          ) : (
+            <motion.div className="cart-items">
+              <AnimatePresence>
+                {cartItems.map((item, idx) => (
+                  <motion.div
+                    key={`${item.id}-${item.selectedColor || idx}`}
+                    className="cart-item"
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    transition={{ delay: idx * 0.05 }}
+                    layout
+                  >
+                    <motion.div
+                      className="item-image"
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      <img
+                        src={item.img || item.imgsrc}
+                        alt={item.title}
+                        onError={(e) => {
+                          e.target.src = `https://via.placeholder.com/80x100?text=${item.title}`;
+                        }}
+                      />
+                    </motion.div>
+
+                    <div className="item-details">
+                      <h3 className="item-title">{item.title}</h3>
+
+                      {item.selectedColor && (
+                        <div className="item-color">
+                          Color: <strong>{item.selectedColor}</strong>
+                        </div>
+                      )}
+
+                      <div className="item-price">
+                        ₦ {item.price.toLocaleString()}
+                      </div>
+
+                      <div className="item-controls">
+                        <div className="quantity-control">
+                          <motion.button
+                            className="qty-btn"
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity - 1)
+                            }
+                            disabled={item.quantity <= 1}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <Minus size={16} />
+                          </motion.button>
+                          <span className="qty-display">{item.quantity}</span>
+                          <motion.button
+                            className="qty-btn"
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity + 1)
+                            }
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <Plus size={16} />
+                          </motion.button>
+                        </div>
+
+                        <motion.button
+                          className="delete-btn"
+                          onClick={() => removeFromCart(item.id)}
+                          whileHover={{ scale: 1.15, backgroundColor: "rgba(211, 47, 47, 0.2)" }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Trash2 size={18} />
+                        </motion.button>
+                      </div>
+
+                      <div className="item-total">
+                        Total: ₦ {(item.price * item.quantity).toLocaleString()}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Cart Footer */}
+        {cartItems.length > 0 && (
+          <motion.div
+            className="cart-footer"
+            initial={{ opacity: 0, y: 20 }}
+            animate={showCart ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="price-breakdown">
+              <div className="price-row">
+                <span>Subtotal:</span>
+                <span>₦ {totalPrice.toLocaleString()}</span>
+              </div>
+              <div className="price-row">
+                <span>Shipping:</span>
+                <span className="shipping-free">FREE</span>
+              </div>
+              <div className="price-row divider">
+                <span>Tax:</span>
+                <span>Calculated at checkout</span>
+              </div>
+              <div className="price-row total">
+                <span>Total:</span>
+                <span>₦ {totalPrice.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <motion.button
+              className="checkout-btn"
+              whileHover={{ scale: 1.02, boxShadow: "0 15px 40px rgba(211, 47, 47, 0.3)" }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Proceed to Checkout
+              <ArrowRight size={18} />
+            </motion.button>
+
+            <motion.button
+              className="continue-shopping-btn"
+              onClick={() => setShowCart(false)}
+              whileHover={{ backgroundColor: "rgba(211, 47, 47, 0.08)" }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Continue Shopping
+            </motion.button>
+
+            <motion.button
+              className="clear-cart-btn"
+              onClick={clearCart}
+              whileHover={{ color: "#d32f2f" }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Clear Cart
+            </motion.button>
+          </motion.div>
+        )}
+      </motion.div>
+    </>
   );
 }
