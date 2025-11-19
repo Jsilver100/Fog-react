@@ -91,6 +91,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  padding: 10px;
 }
 
 .cart-btn {
@@ -107,8 +108,8 @@
 /* CART BADGE */
 .cart-badge {
   position: absolute;
-  top: 2px;
-  right: 2px;
+  top: 5px;
+  right: 5px;
   background: linear-gradient(135deg, #d32f2f, #e57373);
   color: white;
   width: 15px;
@@ -144,6 +145,8 @@
   color: #fff;
   display: none;
   transition: transform 0.2s ease, color 0.2s ease;
+  background: transparent;
+  border: none;
 }
 .menu-toggle:hover {
   transform: scale(1.2);

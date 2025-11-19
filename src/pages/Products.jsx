@@ -56,12 +56,12 @@ export default function Products({ limit = null, compact = false }) {
     }
   };
 
-  // Filter products (can add category filtering here if needed)
+  // Filter products
   const filteredProducts = products;
 
   // Apply limit if provided
   const finalProducts = limit
-    ? filteredProducts.slice(-limit).reverse() // take last N products and reverse to show newest first
+    ? filteredProducts.slice(-limit).reverse()
     : filteredProducts;
 
   // OPEN MODAL (FETCH FULL DETAILS)
@@ -80,10 +80,37 @@ export default function Products({ limit = null, compact = false }) {
   // CLOSE MODAL
   const closeModal = () => setSelectedProduct(null);
 
-  // Add to Cart
+  // Add to Cart - FIX: Ensure all required fields are present
   const handleAddToCart = (productData) => {
-    addToCart(productData);
+    // Ensure we have both 'name' and 'title' for compatibility
+    const cartItem = {
+      id: productData.id,
+      name: productData.name || productData.title,
+      title: productData.name || productData.title,
+      price: productData.price,
+      imgsrc: productData.imgsrc || productData.img,
+      quantity: productData.quantity || 1,
+      selectedColor: productData.selectedColor || null
+    };
+    
+    addToCart(cartItem);
     closeModal();
+  };
+
+  // Quick add to cart from product grid
+  const quickAddToCart = (product, e) => {
+    e.stopPropagation();
+    
+    const cartItem = {
+      id: product.id,
+      name: product.name,
+      title: product.name,
+      price: product.price,
+      imgsrc: product.imgsrc,
+      quantity: 1
+    };
+    
+    addToCart(cartItem);
   };
 
   // Loading state
@@ -171,10 +198,7 @@ export default function Products({ limit = null, compact = false }) {
               </p>
               <button
                 className="addcart"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAddToCart(product);
-                }}
+                onClick={(e) => quickAddToCart(product, e)}
               >
                 <ShoppingCart size={16} /> Add to Cart
               </button>
