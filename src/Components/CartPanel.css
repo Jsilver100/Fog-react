@@ -1,7 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<style>
 /* ===================================
    ULTRA-MODERN CART PANEL CSS 2025
    WITH DELIVERY OPTIONS
@@ -36,6 +32,14 @@
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
   z-index: 9997;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, pointer-events 0.4s ease;
+}
+
+.cart-overlay.active {
+  opacity: 1;
+  pointer-events: all;
 }
 
 /* ===================================
@@ -767,9 +771,3 @@
     animation: none !important;
   }
 }
-</style>
-</head>
-<body>
-<!-- This is a CSS-only artifact for CartPanel.css -->
-</body>
-</html>

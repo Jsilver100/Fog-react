@@ -31,7 +31,7 @@ const DELIVERY_AREAS = [
 export default function CartPanel() {
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useContext(CartContext);
   const [showCart, setShowCart] = useState(false);
-  const [deliveryMethod, setDeliveryMethod] = useState("pickup"); // "pickup" or "delivery"
+  const [deliveryMethod, setDeliveryMethod] = useState("pickup");
   const [selectedStore, setSelectedStore] = useState(STORE_LOCATIONS[0]);
   const [selectedArea, setSelectedArea] = useState(null);
   const [customerInfo, setCustomerInfo] = useState({
@@ -41,15 +41,24 @@ export default function CartPanel() {
   });
 
   useEffect(() => {
-    const toggleHandler = () => setShowCart((prev) => !prev);
+    const toggleHandler = () => {
+      setShowCart((prev) => {
+        const newState = !prev;
+        document.body.style.overflow = newState ? 'hidden' : 'auto';
+        return newState;
+      });
+    };
+    
     window.addEventListener("toggleCart", toggleHandler);
-    return () => window.removeEventListener("toggleCart", toggleHandler);
+    return () => {
+      window.removeEventListener("toggleCart", toggleHandler);
+      document.body.style.overflow = 'auto';
+    };
   }, []);
 
   const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
   
-  // Calculate shipping fee
   const shippingFee = deliveryMethod === "pickup" ? 0 : (selectedArea?.fee || 0);
   const totalPrice = subtotal + shippingFee;
 
@@ -81,7 +90,6 @@ export default function CartPanel() {
       return;
     }
 
-    // Prepare order summary
     const orderSummary = {
       items: cartItems,
       deliveryMethod,
@@ -94,7 +102,6 @@ export default function CartPanel() {
 
     console.log("Order Summary:", orderSummary);
     
-    // Here you would typically send this to your backend
     alert(`Order placed successfully!\n\nDelivery Method: ${deliveryMethod === "pickup" ? "Store Pickup" : "Home Delivery"}\nTotal: ₦${totalPrice.toLocaleString()}\n\nYou will receive a confirmation shortly.`);
     
     clearCart();
@@ -106,7 +113,7 @@ export default function CartPanel() {
       <AnimatePresence>
         {showCart && (
           <motion.div
-            className="cart-overlay"
+            className="cart-overlay active"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
