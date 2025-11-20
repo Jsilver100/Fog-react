@@ -3,6 +3,7 @@ import Header from "./Components/Header";
 import Home from "./pages/Home";
 import ProductsPage from "./pages/Products";
 import OrdersPage from "./pages/Orders";
+import Checkout from "./pages/Checkout";
 import CartPanel from "./Components/CartPanel";
 import { CartProvider } from "./lib/cart";
 import "./App.css";
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/checkout" element={<Checkout />} />
       </Routes>
 
       <CartPanel />
